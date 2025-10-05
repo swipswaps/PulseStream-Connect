@@ -1,0 +1,5 @@
+{
+  "name": "PulseStream Connect",
+  "description": "An interactive guide to help you create, manage, and configure PulseAudio network streams between machines. Generate the necessary server and client commands with ease.",
+  "requestFramePermissions": []
+}
