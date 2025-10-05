@@ -7,9 +7,10 @@ interface ConnectionListProps {
   connections: Connection[];
   onDelete: (id: string) => void;
   onView: (connection: Connection) => void;
+  onEdit: (connection: Connection) => void;
 }
 
-const ConnectionList: React.FC<ConnectionListProps> = ({ connections, onDelete, onView }) => {
+const ConnectionList: React.FC<ConnectionListProps> = ({ connections, onDelete, onView, onEdit }) => {
   if (connections.length === 0) {
     return (
       <div className="text-center p-12 border-2 border-dashed border-gray-700 rounded-lg bg-gray-800/50">
@@ -27,6 +28,7 @@ const ConnectionList: React.FC<ConnectionListProps> = ({ connections, onDelete, 
           connection={connection}
           onDelete={onDelete}
           onView={onView}
+          onEdit={onEdit}
         />
       ))}
     </div>

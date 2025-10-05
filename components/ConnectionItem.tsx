@@ -3,14 +3,16 @@ import React from 'react';
 import type { Connection } from '../types';
 import { EyeIcon } from './icons/EyeIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import { PencilIcon } from './icons/PencilIcon';
 
 interface ConnectionItemProps {
   connection: Connection;
   onDelete: (id: string) => void;
   onView: (connection: Connection) => void;
+  onEdit: (connection: Connection) => void;
 }
 
-const ConnectionItem: React.FC<ConnectionItemProps> = ({ connection, onDelete, onView }) => {
+const ConnectionItem: React.FC<ConnectionItemProps> = ({ connection, onDelete, onView, onEdit }) => {
   return (
     <div className="bg-gray-800 rounded-lg p-4 flex items-center justify-between shadow-md hover:shadow-cyan-500/20 hover:border-cyan-500 border border-transparent transition-all duration-300">
       <div>
@@ -26,6 +28,13 @@ const ConnectionItem: React.FC<ConnectionItemProps> = ({ connection, onDelete, o
           aria-label="View Instructions"
         >
           <EyeIcon />
+        </button>
+        <button
+          onClick={() => onEdit(connection)}
+          className="p-2 rounded-full bg-yellow-500/20 hover:bg-yellow-500/40 text-yellow-300 transition-colors"
+          aria-label="Edit Connection"
+        >
+          <PencilIcon />
         </button>
         <button
           onClick={() => onDelete(connection.id)}

@@ -1,20 +1,67 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# PulseStream Connect
 
-# Run and deploy your AI Studio app
+An interactive guide to help you create, manage, and configure PulseAudio network streams between machines. Generate the necessary server and client commands with ease.
 
-This contains everything you need to run your app locally.
+## What It Does
 
-View your app in AI Studio: https://ai.studio/apps/drive/1TGNtfV9OOyba1arpOPE5SCedSlTQyqmB
+PulseStream Connect provides a simple, interactive user interface to manage PulseAudio network streaming configurations between two machines on your local network. It's designed to abstract away the complexity of manual configuration by generating the exact shell commands you need to copy and paste into your terminals.
 
-## Run Locally
+Stop searching through forums and documentation every time you want to route audio from one computer to another. With PulseStream Connect, you can save your configurations and get the setup commands in seconds.
 
-**Prerequisites:**  Node.js
+## Features
 
+- **Intuitive UI**: A clean, modern interface for managing your connections.
+- **Full CRUD Support**: Create, read, update, and delete connection profiles with ease.
+- **Persistent Storage**: Saves your connections in your browser's local storage so they're always there when you need them.
+- **Step-by-Step Guidance**: Generates clear, copy-pasteable commands for both the server (audio source) and client (audio output) machines.
+- **Detailed Explanations**: Understand *why* each command works, with in-app explanations for every step and parameter.
+- **Clean & Responsive**: A modern, dark-themed interface that works great on any screen size.
+- **Zero Backend**: Runs entirely in your browser. No data is sent to any server.
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## How It Works: A User Guide
+
+### Terminology
+
+- **Server**: The machine where the audio is **originating** (e.g., the one playing a game, video, or music).
+- **Client**: The machine where you want the audio to be **played** (e.g., the one connected to your good speakers or headphones).
+
+### Step-by-Step Instructions
+
+1.  **Open the App**: Navigate to the PulseStream Connect web page.
+
+2.  **Create a New Connection**:
+    - Click the **"New Connection"** button.
+    - A form will pop up. Fill in the details:
+        - **Connection Name**: A memorable name for this setup (e.g., "Gaming PC to Living Room TV").
+        - **Server IP Address**: The local IP address of the audio source machine.
+        - **Client IP Address**: The local IP address of the audio playback machine.
+    - Click **"Create Connection"**.
+
+3.  **Manage Your Connection**:
+    - Your new connection will appear in the list on the main screen.
+    - Use the icons on the right to manage it:
+        - **View (Eye Icon)**: Opens the step-by-step setup instructions.
+        - **Edit (Pencil Icon)**: Allows you to change the name or IP addresses.
+        - **Delete (Trash Icon)**: Removes the connection.
+
+4.  **Execute the Commands**:
+    - Click the **View icon**.
+    - A modal will appear with two sets of commands.
+    - **On the Server machine**, open a terminal and execute the commands under the "On the Server Machine" section, one by one. Read the explanations to understand what they do.
+    - **On the Client machine**, open a terminal and execute the commands under the "On the Client Machine" section.
+
+5.  **Enjoy Your Stream!**
+    - After running the client commands, any PulseAudio-aware application you launch from that *same terminal* will now route its audio to the server machine for playback. The example command shows how to test this with `mpv`.
+
+## Technical Details
+
+- **Stack**: React, TypeScript, Tailwind CSS
+- **State Management**: React Hooks (`useState`)
+- **Persistence**: Browser `localStorage` via a custom `useLocalStorage` hook.
+
+This application is a static web app that serves as a frontend for generating shell commands. It helps users configure PulseAudio's `module-native-protocol-tcp` for network audio streaming without requiring them to remember the specific commands or firewall rules.
+
+## Disclaimer
+
+-   **Security**: This tool is intended for use on a **trusted local network only**. Exposing PulseAudio to the public internet is a significant security risk. The generated commands are configured to only allow access from the specific client IP you provide.
+-   **Compatibility**: The generated server commands are tailored for Linux distributions that use `firewalld` (e.g., Fedora, CentOS, RHEL). For distributions using `ufw` (e.g., Ubuntu, Debian), you will need to adapt the firewall command (e.g., `sudo ufw allow 4713/tcp`).

@@ -1,18 +1,30 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { Connection } from '../types';
 import { XIcon } from './icons/XIcon';
 
 interface ConnectionFormProps {
   onAdd: (connection: Omit<Connection, 'id'>) => void;
+  onUpdate: (connection: Connection) => void;
   onClose: () => void;
+  connectionToEdit?: Connection | null;
 }
 
-const ConnectionForm: React.FC<ConnectionFormProps> = ({ onAdd, onClose }) => {
+const ConnectionForm: React.FC<ConnectionFormProps> = ({ onAdd, onUpdate, onClose, connectionToEdit }) => {
   const [name, setName] = useState('');
   const [serverIp, setServerIp] = useState('');
   const [clientIp, setClientIp] = useState('');
   const [error, setError] = useState('');
+
+  const isEditing = !!connectionToEdit;
+
+  useEffect(() => {
+    if (isEditing) {
+      setName(connectionToEdit.name);
+      setServerIp(connectionToEdit.serverIp);
+      setClientIp(connectionToEdit.clientIp);
+    }
+  }, [connectionToEdit, isEditing]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +39,11 @@ const ConnectionForm: React.FC<ConnectionFormProps> = ({ onAdd, onClose }) => {
         return;
     }
 
-    onAdd({ name, serverIp, clientIp });
+    if (isEditing) {
+      onUpdate({ id: connectionToEdit.id, name, serverIp, clientIp });
+    } else {
+      onAdd({ name, serverIp, clientIp });
+    }
     setError('');
   };
 
@@ -37,7 +53,7 @@ const ConnectionForm: React.FC<ConnectionFormProps> = ({ onAdd, onClose }) => {
         <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-300">
           <XIcon />
         </button>
-        <h2 className="text-2xl font-bold mb-4 text-cyan-400">New Connection</h2>
+        <h2 className="text-2xl font-bold mb-4 text-cyan-400">{isEditing ? 'Edit Connection' : 'New Connection'}</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-300">Connection Name</label>
@@ -78,7 +94,7 @@ const ConnectionForm: React.FC<ConnectionFormProps> = ({ onAdd, onClose }) => {
               type="submit"
               className="w-full bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300"
             >
-              Create Connection
+              {isEditing ? 'Update Connection' : 'Create Connection'}
             </button>
           </div>
         </form>

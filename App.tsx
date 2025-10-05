@@ -11,6 +11,7 @@ import { PlusIcon } from './components/icons/PlusIcon';
 const App: React.FC = () => {
   const [connections, setConnections] = useLocalStorage<Connection[]>('pulse-connections', []);
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
+  const [editingConnection, setEditingConnection] = useState<Connection | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<Connection | null>(null);
 
   const addConnection = (connection: Omit<Connection, 'id'>) => {
@@ -19,8 +20,24 @@ const App: React.FC = () => {
     setIsFormOpen(false);
   };
 
+  const updateConnection = (updatedConnection: Connection) => {
+    setConnections(connections.map(c => c.id === updatedConnection.id ? updatedConnection : c));
+    setEditingConnection(null);
+    setIsFormOpen(false);
+  };
+
   const deleteConnection = (id: string) => {
     setConnections(connections.filter(c => c.id !== id));
+  };
+  
+  const handleEdit = (connection: Connection) => {
+    setEditingConnection(connection);
+    setIsFormOpen(true);
+  };
+
+  const handleCloseForm = () => {
+    setIsFormOpen(false);
+    setEditingConnection(null);
   };
 
   const openInstructions = (connection: Connection) => {
@@ -50,12 +67,15 @@ const App: React.FC = () => {
           connections={connections}
           onDelete={deleteConnection}
           onView={openInstructions}
+          onEdit={handleEdit}
         />
 
         {isFormOpen && (
           <ConnectionForm
             onAdd={addConnection}
-            onClose={() => setIsFormOpen(false)}
+            onUpdate={updateConnection}
+            connectionToEdit={editingConnection}
+            onClose={handleCloseForm}
           />
         )}
 
