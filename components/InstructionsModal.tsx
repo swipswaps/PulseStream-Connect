@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import type { Connection } from '../types';
 import { ClipboardIcon } from './icons/ClipboardIcon';
 import { XIcon } from './icons/XIcon';
+import { InfoIcon } from './icons/InfoIcon';
 
 interface InstructionsModalProps {
   connection: Connection;
@@ -12,6 +13,7 @@ const CodeBlock: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = useCallback(() => {
+        if (!children) return;
         const textToCopy = String(children);
         navigator.clipboard.writeText(textToCopy).then(() => {
             setCopied(true);
@@ -35,12 +37,23 @@ const CodeBlock: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     );
 };
 
+const VerificationResult: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="mt-3 flex items-start gap-3 rounded-md bg-sky-900/50 p-3 text-sm text-sky-200 border border-sky-800">
+      <div className="mt-0.5 flex-shrink-0">
+          <InfoIcon />
+      </div>
+      <div>{children}</div>
+  </div>
+);
+
+
 const InstructionStep: React.FC<{
   step: string;
   title: string;
   command: string;
   explanation: React.ReactNode;
-}> = ({ step, title, command, explanation }) => (
+  verification?: React.ReactNode;
+}> = ({ step, title, command, explanation, verification }) => (
   <div className="border-l-4 border-gray-700 pl-4 py-2">
     <h4 className="font-semibold text-lg text-gray-200">
       <span className="text-cyan-400 font-bold mr-2">{step}.</span>
@@ -48,6 +61,7 @@ const InstructionStep: React.FC<{
     </h4>
     <div className="text-gray-400 my-2 text-sm space-y-2">{explanation}</div>
     <CodeBlock>{command}</CodeBlock>
+    {verification && <VerificationResult>{verification}</VerificationResult>}
   </div>
 );
 
@@ -79,10 +93,13 @@ const InstructionsModal: React.FC<InstructionsModalProps> = ({ connection, onClo
                     />
                     <InstructionStep
                         step="2"
-                        title="Reload Firewall"
-                        command="sudo firewall-cmd --reload"
+                        title="Reload & Verify Firewall"
+                        command="sudo firewall-cmd --reload && sudo firewall-cmd --list-ports"
                         explanation={
-                            <p>This applies your new firewall rule immediately without needing to restart the service or the machine.</p>
+                            <p>This single command does two things: first, it applies your new firewall rule immediately (<code>--reload</code>), then it lists all open ports. This lets you instantly verify the change.</p>
+                        }
+                        verification={
+                           <p><strong>Expected Result:</strong> You must see <code>4713/tcp</code> in the output list. If not, the previous command failed, possibly due to a permissions issue or because `firewalld` is not your system's firewall.</p>
                         }
                     />
                      <InstructionStep
@@ -112,7 +129,17 @@ const InstructionsModal: React.FC<InstructionsModalProps> = ({ connection, onClo
                         title="Test Connection to Server"
                         command={`nc -zv ${connection.serverIp} 4713`}
                         explanation={
-                             <p>Use the network utility <code>nc</code> (netcat) to check if the server's port <code>4713</code> is reachable from the client. A "succeeded!" message means you're good to go. If it fails, double-check the server's IP and firewall settings.</p>
+                             <p>Use the network utility <code>nc</code> (netcat) to check if the server's port <code>4713</code> is reachable from the client. This is the most important test to ensure your machines can communicate.</p>
+                        }
+                        verification={
+                            <>
+                                <p><strong>Expected Result:</strong> A "Connection to ... succeeded!" message.</p>
+                                <p className="mt-2 font-semibold">Troubleshooting:</p>
+                                <ul className="list-disc list-inside text-gray-400">
+                                    <li>If it says <strong>"Connection refused,"</strong> the server's firewall is likely blocking you, or the PulseAudio module (Server Step 3) isn't loaded.</li>
+                                    <li>If it <strong>hangs or times out,</strong> you may have a network issue (are they on the same WiFi?) or the Server IP address is incorrect.</li>
+                                </ul>
+                            </>
                         }
                     />
                     <InstructionStep
@@ -132,7 +159,7 @@ const InstructionsModal: React.FC<InstructionsModalProps> = ({ connection, onClo
                         command={`mpv --ao=pulse "https://www.youtube.com/watch?v=dQw4w9WgXcQ"`}
                         explanation={
                             <>
-                                <p>Launch a media player like <code>mpv</code> and explicitly tell it to use PulseAudio with <code>--ao=pulse</code>. The application will play on your client machine, but the audio should be coming from your server machine's speakers.</p>
+                                <p>Launch a media player like <code>mpv</code> and explicitly tell it to use PulseAudio with <code>--ao=pulse</code>. The application will run on your client machine, but the audio should now be heard from your server machine's speakers.</p>
                                 <p className="mt-2 text-gray-500 text-xs">Any application launched from this terminal will now send its audio to the server.</p>
                             </>
                         }
