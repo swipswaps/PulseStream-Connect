@@ -91,4 +91,4 @@ This application is a static web app that serves as a frontend for generating sh
 ## Disclaimer
 
 -   **Security**: This tool is intended for use on a **trusted local network only**. Exposing PulseAudio to the public internet is a significant security risk. The generated commands are configured to only allow access from the specific client IP you provide.
--   **Compatibility**: The generated server commands are tailored for Linux distributions that use `firewalld` (e.g., Fedora, CentOS, RHEL). For distributions using `ufw` (e.g., Ubuntu, Debian), you will need to adapt the firewall command (e.g., `sudo ufw allow 4713/tcp`).
+-   **Compatibility**: The generated server commands are tailored for Linux distributions that use `firewalld` (e.g., Fedora, CentOS, RHEL). For distributions using `ufw` (e.g., Ubuntu, Debian), you will need to adapt the firewall command (e.g., `sudo ufw allow 4713/tcp`). The app's instructions for `firewalld` guide you through finding and using your active firewall zone for best results.

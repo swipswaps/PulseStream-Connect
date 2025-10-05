@@ -9,7 +9,7 @@ interface InstructionsModalProps {
   onClose: () => void;
 }
 
-const CodeBlock: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const CodeBlock: React.FC<{ children: React.ReactNode; }> = ({ children }) => {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = useCallback(() => {
@@ -50,7 +50,7 @@ const VerificationResult: React.FC<{ children: React.ReactNode }> = ({ children 
 const InstructionStep: React.FC<{
   step: string;
   title: string;
-  command: string;
+  command?: string;
   explanation: React.ReactNode;
   verification?: React.ReactNode;
 }> = ({ step, title, command, explanation, verification }) => (
@@ -60,7 +60,7 @@ const InstructionStep: React.FC<{
       {title}
     </h4>
     <div className="text-gray-400 my-2 text-sm space-y-2">{explanation}</div>
-    <CodeBlock>{command}</CodeBlock>
+    {command && <CodeBlock>{command}</CodeBlock>}
     {verification && <VerificationResult>{verification}</VerificationResult>}
   </div>
 );
@@ -85,25 +85,39 @@ const InstructionsModal: React.FC<InstructionsModalProps> = ({ connection, onClo
                 <div className="space-y-6">
                     <InstructionStep
                         step="1"
-                        title="Open Firewall Port"
-                        command="sudo firewall-cmd --add-port=4713/tcp --permanent"
+                        title="Find Your Default Firewall Zone (Optional)"
+                        command="firewall-cmd --get-default-zone"
                         explanation={
-                            <p>This command tells your server's firewall (<code>firewalld</code>) to open TCP port <code>4713</code>. This is the default port PulseAudio uses for network connections. The <code>--permanent</code> flag ensures this rule persists after a reboot.</p>
+                            <p>This command identifies your system's main firewall profile (zone). The next steps will use this command automatically, so you don't need to manually edit anything. This step is just for your information.</p>
+                        }
+                         verification={
+                           <p><strong>Expected Result:</strong> The output will be a single word, which is the name of your default zone (e.g., `public`, `FedoraWorkstation`, `home`).</p>
                         }
                     />
                     <InstructionStep
                         step="2"
-                        title="Reload & Verify Firewall"
-                        command="sudo firewall-cmd --reload && sudo firewall-cmd --list-ports"
+                        title="Open Firewall Port"
+                        command="sudo firewall-cmd --zone=$(firewall-cmd --get-default-zone) --add-port=4713/tcp --permanent"
                         explanation={
-                            <p>This single command does two things: first, it applies your new firewall rule immediately (<code>--reload</code>), then it lists all open ports. This lets you instantly verify the change.</p>
+                            <>
+                              <p>This command opens the PulseAudio port (`4713`) in your system's default firewall zone. The `--permanent` flag ensures this rule persists after a reboot.</p>
+                               <p className="mt-2 text-gray-500 text-xs">The `$(firewall-cmd --get-default-zone)` part automatically inserts your default zone name, so you can copy and paste the entire command without changes.</p>
+                            </>
+                        }
+                    />
+                    <InstructionStep
+                        step="3"
+                        title="Reload & Verify Firewall"
+                        command="sudo firewall-cmd --reload && sudo firewall-cmd --zone=$(firewall-cmd --get-default-zone) --list-ports"
+                        explanation={
+                            <p>This reloads the firewall to apply your new rule, then immediately lists the ports for your default zone to confirm the change. This command is also ready to be copied and pasted directly.</p>
                         }
                         verification={
-                           <p><strong>Expected Result:</strong> You must see <code>4713/tcp</code> in the output list. If not, the previous command failed, possibly due to a permissions issue or because `firewalld` is not your system's firewall.</p>
+                           <p><strong>Expected Result:</strong> You must see `4713/tcp` in the output list. If not, something is unusual about your firewall setup, and you may need to investigate your active zones manually.</p>
                         }
                     />
                      <InstructionStep
-                        step="3"
+                        step="4"
                         title="Enable Network Audio (Temporarily)"
                         command={`pactl load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;${connection.clientIp}`}
                         explanation={
@@ -136,7 +150,7 @@ const InstructionsModal: React.FC<InstructionsModalProps> = ({ connection, onClo
                                 <p><strong>Expected Result:</strong> A "Connection to ... succeeded!" message.</p>
                                 <p className="mt-2 font-semibold">Troubleshooting:</p>
                                 <ul className="list-disc list-inside text-gray-400">
-                                    <li>If it says <strong>"Connection refused,"</strong> the server's firewall is likely blocking you, or the PulseAudio module (Server Step 3) isn't loaded.</li>
+                                    <li>If it says <strong>"Connection refused,"</strong> the server's firewall is likely blocking you, or the PulseAudio module (Server Step 4) isn't loaded.</li>
                                     <li>If it <strong>hangs or times out,</strong> you may have a network issue (are they on the same WiFi?) or the Server IP address is incorrect.</li>
                                 </ul>
                             </>
