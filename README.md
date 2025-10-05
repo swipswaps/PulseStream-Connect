@@ -18,6 +18,32 @@ Stop searching through forums and documentation every time you want to route aud
 - **Clean & Responsive**: A modern, dark-themed interface that works great on any screen size.
 - **Zero Backend**: Runs entirely in your browser. No data is sent to any server.
 
+## Getting Started: Running Locally
+
+To run this application on your own machine, you'll need to have [Node.js](https://nodejs.org/) installed (which includes `npm`).
+
+1.  **Clone the repository** (if you haven't already):
+    ```bash
+    git clone https://github.com/swipswaps/PulseStream-Connect-v2.git
+    cd PulseStream-Connect-v2
+    ```
+
+2.  **Install dependencies**:
+    This command reads the `package.json` file and downloads the necessary libraries (like React) into a `node_modules` folder.
+    ```bash
+    npm install
+    ```
+
+3.  **Start the development server**:
+    This command starts a local web server to host the application.
+    ```bash
+    npm run dev
+    ```
+
+4.  **Open the App**:
+    Your terminal will display a local URL. Open this URL in your web browser. It will typically be:
+    **`http://localhost:5173`**
+
 ## How It Works: A User Guide
 
 ### Terminology
@@ -27,7 +53,7 @@ Stop searching through forums and documentation every time you want to route aud
 
 ### Step-by-Step Instructions
 
-1.  **Open the App**: Navigate to the PulseStream Connect web page.
+1.  **Run and Open the App**: Follow the "Getting Started" instructions above to run the local server. Navigate to the provided `localhost` address in your browser.
 
 2.  **Create a New Connection**:
     - Click the **"New Connection"** button.
@@ -56,6 +82,7 @@ Stop searching through forums and documentation every time you want to route aud
 ## Technical Details
 
 - **Stack**: React, TypeScript, Tailwind CSS
+- **Build Tool**: Vite
 - **State Management**: React Hooks (`useState`)
 - **Persistence**: Browser `localStorage` via a custom `useLocalStorage` hook.
 
